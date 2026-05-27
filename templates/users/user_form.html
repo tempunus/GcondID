@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="catalog-form-page">
+  <div class="catalog-form-wrap">
+    <h1>{% if object %}Editar Usuario{% else %}Cadastro de Usuario{% endif %}</h1>
+    <form method="post" class="catalog-form">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <div class="catalog-section-title">Informacoes do usuario</div>
+      <div class="catalog-grid two">
+        <div class="catalog-field">{{ form.first_name.label_tag }}{{ form.first_name }}{{ form.first_name.errors }}</div>
+        <div class="catalog-field">{{ form.last_name.label_tag }}{{ form.last_name }}{{ form.last_name.errors }}</div>
+      </div>
+
+      <div class="catalog-section-title">Contato e acesso</div>
+      <div class="catalog-grid two">
+        <div class="catalog-field">{{ form.email.label_tag }}{{ form.email }}{{ form.email.errors }}</div>
+        <div class="catalog-field">{{ form.phone.label_tag }}{{ form.phone }}{{ form.phone.errors }}</div>
+      </div>
+
+      <div class="catalog-section-title">Permissoes da conta</div>
+      <div class="catalog-grid two">
+        <div class="catalog-field">{{ form.access_level.label_tag }}{{ form.access_level }}{{ form.access_level.errors }}</div>
+        <div class="catalog-check-grid">
+          <label>{{ form.is_approved }} <span>Aprovado</span></label>
+          <label>{{ form.is_blocked }} <span>Bloqueado</span></label>
+          <label>{{ form.is_active }} <span>Ativo</span></label>
+        </div>
+      </div>
+
+      {% if form.password1 %}
+        <div class="catalog-section-title">Senha inicial</div>
+        <div class="catalog-grid two">
+          <div class="catalog-field">{{ form.password1.label_tag }}{{ form.password1 }}{{ form.password1.errors }}</div>
+          <div class="catalog-field">{{ form.password2.label_tag }}{{ form.password2 }}{{ form.password2.errors }}</div>
+        </div>
+      {% endif %}
+
+      <div class="catalog-actions">
+        <a class="catalog-back" href="{% url 'users:list' %}">Voltar</a>
+        <button class="btn btn-primary">Salvar usuario</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="catalog-form-page">
+  <div class="catalog-form-wrap">
+    <h1>{% if object %}Editar Item{% else %}Cadastro de Item{% endif %}</h1>
+    <form method="post" class="catalog-form">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="catalog-section-title">Informacoes do item</div>
+      <div class="catalog-grid two">
+        <div class="catalog-field">{{ form.name.label_tag }}{{ form.name }}{{ form.name.errors }}</div>
+        <div class="catalog-field">{{ form.category.label_tag }}{{ form.category }}{{ form.category.errors }}</div>
+      </div>
+      <div class="catalog-section-title">Classificacao e localizacao</div>
+      <div class="catalog-grid two">
+        <div class="catalog-field">{{ form.sector.label_tag }}{{ form.sector }}{{ form.sector.errors }}</div>
+        <div class="catalog-field">{{ form.location.label_tag }}{{ form.location }}{{ form.location.errors }}</div>
+      </div>
+      <div class="catalog-section-title">Controle de quantidade</div>
+      <div class="catalog-grid two">
+        <div class="catalog-field">{{ form.current_quantity.label_tag }}{{ form.current_quantity }}{{ form.current_quantity.errors }}</div>
+        <div class="catalog-field">{{ form.minimum_quantity.label_tag }}{{ form.minimum_quantity }}{{ form.minimum_quantity.errors }}</div>
+      </div>
+      <div class="catalog-actions">
+        <a class="catalog-back" href="{% url 'estoque:list' %}">Voltar</a>
+        <button class="btn btn-primary">Salvar item</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

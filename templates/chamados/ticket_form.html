@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="catalog-form-page">
+  <div class="catalog-form-wrap">
+    <h1>{% if object %}Editar Chamado{% else %}Abertura de Chamado{% endif %}</h1>
+    <form method="post" enctype="multipart/form-data" class="catalog-form">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <div class="catalog-section-title">Informacoes do chamado</div>
+      <div class="catalog-grid {% if form.status %}two{% else %}two{% endif %}">
+        <div class="catalog-field">{{ form.sector.label_tag }}{{ form.sector }}{{ form.sector.errors }}</div>
+        <div class="catalog-field">{{ form.priority.label_tag }}{{ form.priority }}{{ form.priority.errors }}</div>
+      </div>
+
+      <div class="catalog-section-title">Responsavel pelo atendimento</div>
+      <div class="catalog-grid {% if form.status %}two{% else %}two{% endif %}">
+        <div class="catalog-field">{{ form.technician.label_tag }}{{ form.technician }}{{ form.technician.errors }}</div>
+        {% if form.status %}
+          <div class="catalog-field">{{ form.status.label_tag }}{{ form.status }}{{ form.status.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="catalog-section-title">Descricao do problema</div>
+      <div class="catalog-field">{{ form.description.label_tag }}{{ form.description }}{{ form.description.errors }}</div>
+
+      <div class="catalog-section-title">Imagens do chamado</div>
+      <div class="catalog-grid {% if form.completion_photo %}two{% else %}two{% endif %}">
+        <div class="catalog-field">{{ form.opening_photo.label_tag }}{{ form.opening_photo }}{{ form.opening_photo.errors }}</div>
+        {% if form.completion_photo %}
+          <div class="catalog-field">{{ form.completion_photo.label_tag }}{{ form.completion_photo }}{{ form.completion_photo.errors }}</div>
+        {% endif %}
+      </div>
+
+      {% if form.solution %}
+        <div class="catalog-section-title">Finalizacao</div>
+        <div class="catalog-field">{{ form.solution.label_tag }}{{ form.solution }}{{ form.solution.errors }}</div>
+      {% endif %}
+
+      <div class="catalog-actions">
+        <a class="catalog-back" href="{% url 'chamados:list' %}">Voltar</a>
+        <button class="btn btn-primary">{% if object %}Salvar chamado{% else %}Abrir chamado{% endif %}</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

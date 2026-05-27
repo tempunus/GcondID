@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Chamado #{{ ticket.id }}</h1>
+  {% if request.user.access_level != 'visitante' or request.user.is_gcondid_admin %}<a class="btn btn-primary" href="{% url 'chamados:edit' ticket.pk %}">Editar</a>{% endif %}
+</div>
+<div class="content-card p-3">
+  <div class="row g-3">
+    <div class="col-md-8">
+      <p><strong>Setor:</strong> {{ ticket.get_sector_display }}</p>
+      <p><strong>Status:</strong> {{ ticket.get_status_display }}</p>
+      <p><strong>Prioridade:</strong> {{ ticket.get_priority_display }}</p>
+      <p><strong>Responsavel:</strong> {{ ticket.technician|default:"-" }}</p>
+      <p><strong>Descricao:</strong><br>{{ ticket.description|linebreaksbr }}</p>
+      {% if ticket.solution %}<p><strong>Solucao aplicada:</strong><br>{{ ticket.solution|linebreaksbr }}</p>{% endif %}
+      {% if ticket.completed_at %}<p><strong>Conclusao:</strong> {{ ticket.completed_at|date:"d/m/Y H:i" }}</p>{% endif %}
+    </div>
+    <div class="col-md-4">
+      {% if ticket.opening_photo %}<p class="mb-2">Foto de abertura</p><img class="thumb mb-3" src="{{ ticket.opening_photo.url }}" alt="Foto de abertura">{% endif %}
+      {% if ticket.completion_photo %}<p class="mb-2">Foto de conclusao</p><img class="thumb" src="{{ ticket.completion_photo.url }}" alt="Foto de conclusao">{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

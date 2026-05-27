@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 mb-1">Dashboard</h1>
+    <p class="text-secondary mb-0">Visao geral operacional do condominio.</p>
+  </div>
+</div>
+<div class="row g-3 mb-4">
+  {% if request.user.is_gcondid_admin %}<div class="col-md-4 col-xl-2"><a class="metric-card" href="{% url 'users:list' %}"><div class="metric-value">{{ total_users }}</div><div class="metric-label">Usuarios</div></a></div>{% endif %}
+  <div class="col-md-4 col-xl-2"><a class="metric-card" href="{% url 'chamados:list' %}?status=aberto"><div class="metric-value">{{ tickets_open }}</div><div class="metric-label">Chamados abertos</div></a></div>
+  <div class="col-md-4 col-xl-2"><a class="metric-card" href="{% url 'chamados:list' %}?status=em_andamento"><div class="metric-value">{{ tickets_progress }}</div><div class="metric-label">Em andamento</div></a></div>
+  <div class="col-md-4 col-xl-2"><a class="metric-card" href="{% url 'chamados:list' %}?status=concluido"><div class="metric-value">{{ tickets_done }}</div><div class="metric-label">Concluidos</div></a></div>
+  {% if request.user.access_level != 'visitante' or request.user.is_gcondid_admin %}<div class="col-md-4 col-xl-2"><a class="metric-card" href="{% url 'estoque:list' %}?critical=1"><div class="metric-value">{{ critical_stock }}</div><div class="metric-label">Estoque critico</div></a></div>{% endif %}
+</div>
+<section class="content-card p-3">
+  <h2 class="h5 mb-3">Movimentacoes recentes</h2>
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead><tr><th>Data</th><th>Item</th><th>Tipo</th><th>Qtd.</th><th>Usuario</th></tr></thead>
+      <tbody>
+      {% for movement in recent_movements %}
+        <tr><td>{{ movement.created_at|date:"d/m/Y H:i" }}</td><td>{{ movement.item.name }}</td><td><span class="badge badge-blue">{{ movement.get_movement_type_display }}</span></td><td>{{ movement.quantity }}</td><td>{{ movement.user.email|default:"-" }}</td></tr>
+      {% empty %}<tr><td colspan="5" class="text-secondary">Nenhuma movimentacao registrada.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

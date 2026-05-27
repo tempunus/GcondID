@@ -1,0 +1,48 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GcondID</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+<div class="app-shell d-flex">
+  <aside class="sidebar p-3 d-none d-lg-flex flex-column" style="width: 280px;">
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <img src="{% static 'img/gcondid-logo.png' %}" class="brand-logo" alt="GcondID">
+      <div>
+        <div class="brand-title">GcondID</div>
+        <small class="text-secondary">Gestao administrativa</small>
+      </div>
+    </div>
+    <nav class="nav flex-column gap-1">
+      <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+      {% if request.user.is_gcondid_admin %}<a class="nav-link" href="{% url 'users:list' %}">Usuarios</a>{% endif %}
+      {% if request.user.access_level != 'visitante' or request.user.is_gcondid_admin %}
+      <a class="nav-link" href="{% url 'estoque:list' %}">Estoque</a>
+      {% endif %}
+      <a class="nav-link" href="{% url 'chamados:list' %}">Chamados</a>
+      {% if request.user.access_level != 'visitante' or request.user.is_gcondid_admin %}
+      <a class="nav-link" href="{% url 'relatorios:index' %}">Relatorios</a>
+      {% endif %}
+    </nav>
+    <div class="mt-auto pt-4">
+      <div class="small text-secondary mb-2">{{ request.user.email }}</div>
+      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="btn btn-outline-light w-100">Sair</button></form>
+    </div>
+  </aside>
+  <main class="flex-grow-1 p-3 p-md-4">
+    <div class="d-lg-none d-flex justify-content-between align-items-center mb-3">
+      <strong class="brand-title">GcondID</strong>
+      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="btn btn-sm btn-outline-light">Sair</button></form>
+    </div>
+    {% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

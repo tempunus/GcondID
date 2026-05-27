@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content-card p-4">
+  <h1 class="h3 mb-3">Excluir usuario</h1>
+  <p class="text-secondary mb-4">
+    Confirme a exclusao de <strong class="text-light">{{ object }}</strong>.
+    Esta acao remove a conta do sistema.
+  </p>
+  <form method="post" class="d-flex gap-2">
+    {% csrf_token %}
+    <button class="btn btn-danger">Excluir usuario</button>
+    <a class="btn btn-outline-light" href="{% url 'users:list' %}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

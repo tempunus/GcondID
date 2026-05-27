@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Chamados</h1>
+  <a class="btn btn-primary" href="{% url 'chamados:create' %}">Abrir chamado</a>
+</div>
+<form class="content-card p-3 mb-3 row g-2">
+  <div class="col-md-3"><select class="form-select" name="status"><option value="">Todos os status</option>{% for value,label in statuses %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select></div>
+  <div class="col-md-3"><select class="form-select" name="sector"><option value="">Todos os setores</option>{% for value,label in sectors %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select></div>
+  <div class="col-md-2"><button class="btn btn-outline-light w-100">Filtrar</button></div>
+</form>
+<div class="table-wrap p-3">
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>#</th><th>Setor</th><th>Prioridade</th><th>Status</th><th>Solicitante</th><th>Responsavel</th><th></th></tr></thead>
+      <tbody>
+      {% for ticket in tickets %}
+        <tr>
+          <td>{{ ticket.id }}</td><td>{{ ticket.get_sector_display }}</td><td>{{ ticket.get_priority_display }}</td>
+          <td><span class="badge badge-blue">{{ ticket.get_status_display }}</span></td><td>{{ ticket.requester }}</td><td>{{ ticket.technician|default:"-" }}</td>
+          <td class="text-end"><a class="btn btn-sm btn-outline-light" href="{% url 'chamados:detail' ticket.pk %}">Ver</a>{% if request.user.access_level != 'visitante' or request.user.is_gcondid_admin %} <a class="btn btn-sm btn-primary" href="{% url 'chamados:edit' ticket.pk %}">Editar</a>{% endif %}</td>
+        </tr>
+      {% empty %}<tr><td colspan="7" class="text-secondary">Nenhum chamado encontrado.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

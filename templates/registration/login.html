@@ -1,0 +1,52 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Entrar - GcondID</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/app.css' %}" />
+  </head>
+  <body class="auth-bg auth-stage">
+    <main class="auth-phone auth-phone-login">
+      <section class="auth-hero">
+        <h1>
+          <img
+            src="{% static 'img/gcondid-logo.png' %}"
+            class="auth-emblem"
+            alt="GcondID"
+          />
+        </h1>
+      </section>
+      <section class="auth-brand">
+        <p>
+          Gestao administrativa de condominios com controle, seguranca e
+          rastreabilidade.
+        </p>
+      </section>
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }}">
+        {{ message }}
+      </div>
+      {% endfor %}
+      <form method="post" class="auth-form">
+        {% csrf_token %} {{ form.non_field_errors }}
+        <div class="auth-field">
+          <span>@</span>{{ form.username }}{{ form.username.errors }}
+        </div>
+        <div class="auth-field">
+          <span>*</span>{{ form.password }}{{ form.password.errors }}
+        </div>
+        <button class="auth-submit">Entrar</button>
+      </form>
+      <div class="auth-social">
+        <small>Criar novo acesso</small>
+        <a href="{% url 'signup' %}">Sign up</a>
+      </div>
+    </main>
+  </body>
+</html>

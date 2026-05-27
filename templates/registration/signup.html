@@ -1,0 +1,29 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cadastro - GcondID</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body class="auth-bg auth-stage">
+  <main class="auth-phone auth-phone-signup">
+    <section class="auth-brand auth-brand-compact">
+      <img src="{% static 'img/gcondid-logo.png' %}" class="auth-emblem" alt="GcondID">
+      <span>Acesso sujeito a aprovacao</span>
+    </section>
+    <form method="post" class="auth-form auth-form-raised">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for field in form %}<div class="auth-field"><span>{% cycle 'N' 'S' '@' '*' '*' %}</span>{{ field }}{{ field.errors }}</div>{% endfor %}
+      <button class="auth-submit">Solicitar cadastro</button>
+      <div class="auth-bottom-row">
+        <a href="{% url 'login' %}">Voltar</a>
+        <small>Ja tem acesso?</small>
+      </div>
+    </form>
+  </main>
+</body>
+</html>
