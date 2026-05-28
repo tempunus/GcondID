@@ -64,11 +64,11 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "HOST": "dpg-d88ent3tq8bs738a9uag-a.oregon-postgres.render.com",
+            "HOST": "dpg-d8c7mmgjo6nc73ekgodg-a.oregon-postgres.render.com",
             "PORT": "5432",
-            "NAME": "gcondid_db_58os",
-            "USER": "admin",
-            "PASSWORD": "EmLd054E0KtEasaN3D0hEhyKhUSrO0KgE",
+            "NAME": "gcondid_db_fbeg",
+            "USER": "gcondid_db_fbeg_user",
+            "PASSWORD": "FjI4HL6dWzR1D7P775FTwavPDCDYLwV4",
             "OPTIONS": {
                 "sslmode": "require",
             },
