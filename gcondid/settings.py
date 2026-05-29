@@ -1,11 +1,12 @@
-import os
+﻿import os
 from pathlib import Path
-import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
+from urllib.parse import unquote, urlparse
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # -----------------------------------------
-# 🔐 SECRET & DEBUG
+# ðŸ” SECRET & DEBUG
 # -----------------------------------------
 
 SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-secret-key")
@@ -18,7 +19,7 @@ ALLOWED_HOSTS = [
 ]
 
 # -----------------------------------------
-# 📦 STATIC & MEDIA (Render)
+# ðŸ“¦ STATIC & MEDIA (Render)
 # -----------------------------------------
 
 STATIC_URL = "/static/"
@@ -31,10 +32,10 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
-# Whitenoise (obrigatório no Render)
+# Whitenoise (obrigatÃ³rio no Render)
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # ✔ serve static no Render
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # âœ” serve static no Render
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -46,18 +47,26 @@ MIDDLEWARE = [
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # -----------------------------------------
-# 🗄️ DATABASE – AUTO pelo RENDER / fallback
+# ðŸ—„ï¸ DATABASE â€“ AUTO pelo RENDER / fallback
 # -----------------------------------------
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
+    parsed_db_url = urlparse(DATABASE_URL)
+    if parsed_db_url.scheme not in {"postgres", "postgresql"}:
+        raise ImproperlyConfigured("MySQL foi removido do sistema. Configure DATABASE_URL com PostgreSQL.")
     DATABASES = {
-        "default": dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
-            ssl_require=True
-        )
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "HOST": parsed_db_url.hostname or "",
+            "PORT": str(parsed_db_url.port or "5432"),
+            "NAME": (parsed_db_url.path or "/").lstrip("/"),
+            "USER": unquote(parsed_db_url.username or ""),
+            "PASSWORD": unquote(parsed_db_url.password or ""),
+            "OPTIONS": {"sslmode": "require"},
+            "CONN_MAX_AGE": 600,
+        }
     }
 else:
     # fallback local
@@ -75,7 +84,7 @@ else:
         }
     }
 # -----------------------------------------
-# 📩 EMAIL (SMTP)
+# ðŸ“© EMAIL (SMTP)
 # -----------------------------------------
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -87,7 +96,7 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # -----------------------------------------
-# 💬 WHATSAPP META API
+# ðŸ’¬ WHATSAPP META API
 # -----------------------------------------
 
 WHATSAPP_PROVIDER = os.getenv("WHATSAPP_PROVIDER", "meta")
@@ -102,7 +111,7 @@ WHATSAPP_SEND_URL = (
 )
 
 # -----------------------------------------
-# 🔐 PASSWORD VALIDATION
+# ðŸ” PASSWORD VALIDATION
 # -----------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -113,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # -----------------------------------------
-# 🌎 CONFIGURAÇÕES GERAIS
+# ðŸŒŽ CONFIGURAÃ‡Ã•ES GERAIS
 # -----------------------------------------
 
 LANGUAGE_CODE = "pt-br"
@@ -123,8 +132,14 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+AUTH_USER_MODEL = 'users.User'
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'dashboard'
+LOGOUT_REDIRECT_URL = 'login'
+
+
 # -----------------------------------------
-# 📁 APPS & TEMPLATES
+# ðŸ“ APPS & TEMPLATES
 # -----------------------------------------
 
 INSTALLED_APPS = [
@@ -161,3 +176,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "gcondid.wsgi.application"
+
+
+

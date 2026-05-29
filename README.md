@@ -1,4 +1,4 @@
-# GcondID
+﻿# GcondID
 
 Aplicacao web Django para gestao administrativa de condominios, com usuarios aprovados por administrador, estoque setorizado, chamados de manutencao, dashboard e relatorios em PDF/Excel.
 
@@ -15,15 +15,11 @@ Acesse `http://127.0.0.1:8000/`.
 
 ## Banco de dados
 
-Por padrao o projeto usa SQLite para facilitar desenvolvimento local. Para PostgreSQL ou MySQL, configure variaveis de ambiente:
+O projeto nao usa MySQL. Use PostgreSQL em producao ou SQLite apenas para desenvolvimento local.
 
 ```powershell
-$env:DB_ENGINE="postgres" # ou mysql
-$env:DB_NAME="gcondid"
-$env:DB_USER="usuario"
-$env:DB_PASSWORD="senha"
-$env:DB_HOST="localhost"
-$env:DB_PORT="5432"
+$env:DATABASE_URL="postgres://usuario:senha@localhost:5432/gcondid"
+
 ```
 
 ## Modulos
@@ -68,3 +64,4 @@ Como alternativa, voce tambem pode usar um webhook proprio que aceite JSON com `
 $env:WHATSAPP_PROVIDER="webhook"
 $env:WHATSAPP_WEBHOOK_URL="https://seu-provedor.example.com/send"
 ```
+
