@@ -457,3 +457,6 @@ label { color: #dfe8f2; margin-bottom: 6px; }
     grid-template-columns: 1fr;
   }
 }
+
+.install-app-btn[hidden] { display: none !important; }
+.install-app-btn { border-radius: 8px; }
