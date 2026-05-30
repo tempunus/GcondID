@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Entrar - GcondID</title>
+    <script>document.documentElement.dataset.theme = localStorage.getItem("gcondid-theme") || "dark";</script>
     <link rel="manifest" href="{% static 'manifest.json' %}" />
     <meta name="theme-color" content="#f5b72e" />
     <link rel="apple-touch-icon" href="{% static 'img/gcondid-logo.png' %}" />
@@ -20,6 +21,7 @@
         <p>Gestao administrativa de condominios com controle, seguranca e rastreabilidade.</p>
       </section>
       {% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}
+      <button class="auth-theme-toggle" type="button" data-theme-toggle>Tema claro</button>
       <form method="post" class="auth-form">
         {% csrf_token %} {{ form.non_field_errors }}
         <div class="auth-field"><span>@</span>{{ form.username }}{{ form.username.errors }}</div>
@@ -27,6 +29,7 @@
         <button class="auth-submit">Entrar</button>
       </form>
     </main>
+    <script src="{% static 'js/theme.js' %}"></script>
     <script src="{% static 'js/pwa.js' %}"></script>
   </body>
 </html>

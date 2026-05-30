@@ -460,3 +460,106 @@ label { color: #dfe8f2; margin-bottom: 6px; }
 
 .install-app-btn[hidden] { display: none !important; }
 .install-app-btn { border-radius: 8px; }
+
+html[data-theme="light"] {
+  --bg: #f4f7fb;
+  --panel: #ffffff;
+  --panel-2: #e9eef5;
+  --text: #101925;
+  --muted: #536579;
+  --gold: #d99b11;
+  --gold-2: #b87905;
+  --blue: #0879ad;
+  --line: rgba(8, 16, 24, .14);
+}
+
+html[data-theme="light"] body {
+  background: radial-gradient(circle at 30% 0%, rgba(217, 155, 17, .14), transparent 32%), var(--bg);
+  color: var(--text);
+}
+
+html[data-theme="light"] .sidebar {
+  background: linear-gradient(180deg, #ffffff, #eaf0f7);
+  border-right-color: var(--line);
+}
+
+html[data-theme="light"] .content-card,
+html[data-theme="light"] .table-wrap,
+html[data-theme="light"] .metric-card {
+  background: rgba(255, 255, 255, .96);
+  border-color: var(--line);
+  box-shadow: 0 18px 40px rgba(15, 25, 40, .10);
+}
+
+html[data-theme="light"] .nav-link { color: #536579; }
+html[data-theme="light"] .nav-link:hover,
+html[data-theme="light"] .nav-link.active { color: #101925; background: rgba(8, 121, 173, .12); }
+html[data-theme="light"] .brand-title { color: #9a6700; }
+html[data-theme="light"] .metric-card { color: #101925; }
+html[data-theme="light"] .metric-card:hover { color: #101925; }
+html[data-theme="light"] .metric-value { color: #9a6700; }
+html[data-theme="light"] .btn-outline-light { color: #101925; border-color: rgba(8, 16, 24, .20); }
+html[data-theme="light"] .btn-outline-light:hover { color: #101925; background: rgba(8, 16, 24, .08); }
+html[data-theme="light"] .form-control,
+html[data-theme="light"] .form-select,
+html[data-theme="light"] textarea,
+html[data-theme="light"] input,
+html[data-theme="light"] select {
+  background-color: #ffffff !important;
+  color: #101925 !important;
+  border-color: rgba(8, 16, 24, .22) !important;
+}
+html[data-theme="light"] label { color: #182638; }
+html[data-theme="light"] .table { --bs-table-color: #101925; --bs-table-border-color: rgba(8, 16, 24, .14); }
+
+html[data-theme="light"] .auth-stage {
+  background:
+    linear-gradient(90deg, rgba(244, 247, 251, .96), rgba(231, 239, 247, .94)),
+    radial-gradient(circle at 25% 8%, rgba(217, 155, 17, .20), transparent 28%),
+    radial-gradient(circle at 72% 56%, rgba(8, 121, 173, .18), transparent 34%),
+    var(--bg);
+}
+html[data-theme="light"] .auth-phone {
+  background: #ffffff;
+  border-color: rgba(217, 155, 17, .35);
+  box-shadow: 0 30px 90px rgba(15, 25, 40, .18), 0 0 80px rgba(217, 155, 17, .10);
+}
+html[data-theme="light"] .auth-phone::before { background: linear-gradient(135deg, #ffffff, #f0f5fb 42%, #b8dcef); }
+html[data-theme="light"] .auth-brand p { color: #9a6700; }
+html[data-theme="light"] .auth-field input { background: #f8fbff !important; color: #101925 !important; border-color: rgba(8, 16, 24, .14) !important; }
+html[data-theme="light"] .auth-input::placeholder { color: rgba(16, 25, 37, .62); }
+
+html[data-theme="light"] .catalog-form-page {
+  background:
+    radial-gradient(circle at 10% 10%, rgba(217, 155, 17, .14), transparent 20%),
+    radial-gradient(circle at 86% 12%, rgba(8, 121, 173, .12), transparent 26%),
+    linear-gradient(135deg, rgba(244, 247, 251, .98), rgba(232, 240, 248, .96));
+}
+html[data-theme="light"] .catalog-form-wrap h1,
+html[data-theme="light"] .catalog-field label,
+html[data-theme="light"] .catalog-back { color: #101925; text-shadow: none; }
+html[data-theme="light"] .catalog-section-title { color: #9a6700; text-shadow: none; }
+html[data-theme="light"] .catalog-field input,
+html[data-theme="light"] .catalog-field select,
+html[data-theme="light"] .catalog-field textarea,
+html[data-theme="light"] .catalog-highlight,
+html[data-theme="light"] .catalog-check-grid label,
+html[data-theme="light"] .catalog-choice-panel label {
+  background: rgba(255, 255, 255, .92) !important;
+  border-color: rgba(8, 16, 24, .30) !important;
+  color: #101925 !important;
+}
+html[data-theme="light"] .catalog-highlight strong { color: #9a6700; }
+
+.theme-toggle,
+.auth-theme-toggle { white-space: nowrap; }
+.auth-theme-toggle {
+  display: block;
+  margin: 0 auto 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  padding: 8px 14px;
+  font-weight: 700;
+}
