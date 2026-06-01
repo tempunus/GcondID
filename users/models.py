@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+﻿from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 
 
@@ -43,6 +43,7 @@ class User(AbstractUser):
     )
     is_approved = models.BooleanField("aprovado", default=False)
     is_blocked = models.BooleanField("bloqueado", default=False)
+    authorized_condominiums = models.ManyToManyField("condominios.Condominium", blank=True, verbose_name="condominios autorizados")
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -57,6 +58,10 @@ class User(AbstractUser):
         return self.is_superuser or self.access_level == self.AccessLevel.ADMIN
 
     @property
+    def has_condominium_access(self):
+        return self.is_gcondid_admin or self.authorized_condominiums.filter(is_active=True).exists()
+
+    @property
     def display_name(self):
         return self.get_full_name() or self.first_name or f"Usuario #{self.pk}"
 
@@ -64,3 +69,4 @@ class User(AbstractUser):
         return self.display_name
 
 # Create your models here.
+

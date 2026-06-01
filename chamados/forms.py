@@ -1,4 +1,4 @@
-from django import forms
+﻿from django import forms
 
 from users.models import User
 
@@ -7,7 +7,7 @@ from .models import Ticket
 
 class ResponsibleUserChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
-        return obj.get_full_name() or obj.email
+        return obj.display_name
 
 
 class TicketCreateForm(forms.ModelForm):
@@ -15,10 +15,16 @@ class TicketCreateForm(forms.ModelForm):
 
     class Meta:
         model = Ticket
-        fields = ("sector", "description", "priority", "technician", "opening_photo")
+        fields = ("condominium", "sector", "description", "priority", "technician", "opening_photo")
 
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
+        if user and not user.is_gcondid_admin:
+            self.fields["condominium"].queryset = user.authorized_condominiums.filter(is_active=True)
+        else:
+            self.fields["condominium"].queryset = self.fields["condominium"].queryset.filter(is_active=True)
+        self.fields["condominium"].required = True
         self.fields["technician"].label = "Usuario responsavel"
         self.fields["technician"].required = True
         self.fields["technician"].queryset = User.objects.filter(
@@ -35,10 +41,16 @@ class TicketUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Ticket
-        fields = ("sector", "description", "priority", "technician", "status", "opening_photo", "completion_photo", "solution")
+        fields = ("condominium", "sector", "description", "priority", "technician", "status", "opening_photo", "completion_photo", "solution")
 
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
+        if user and not user.is_gcondid_admin:
+            self.fields["condominium"].queryset = user.authorized_condominiums.filter(is_active=True)
+        else:
+            self.fields["condominium"].queryset = self.fields["condominium"].queryset.filter(is_active=True)
+        self.fields["condominium"].required = True
         self.fields["technician"].label = "Usuario responsavel"
         self.fields["technician"].queryset = User.objects.filter(
             is_approved=True,

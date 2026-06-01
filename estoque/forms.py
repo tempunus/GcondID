@@ -1,4 +1,4 @@
-from django import forms
+﻿from django import forms
 
 from .models import StockItem
 
@@ -6,10 +6,16 @@ from .models import StockItem
 class StockItemForm(forms.ModelForm):
     class Meta:
         model = StockItem
-        fields = ("name", "category", "sector", "current_quantity", "minimum_quantity", "location")
+        fields = ("condominium", "name", "category", "sector", "current_quantity", "minimum_quantity", "location")
 
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
+        if user and not user.is_gcondid_admin:
+            self.fields["condominium"].queryset = user.authorized_condominiums.filter(is_active=True)
+        else:
+            self.fields["condominium"].queryset = self.fields["condominium"].queryset.filter(is_active=True)
+        self.fields["condominium"].required = True
         placeholders = {
             "name": "Nome do item",
             "category": "Categoria",

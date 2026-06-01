@@ -1,12 +1,12 @@
-from django.contrib import admin
+﻿from django.contrib import admin
 
 from .models import StockItem, StockMovement
 
 
 @admin.register(StockItem)
 class StockItemAdmin(admin.ModelAdmin):
-    list_display = ("name", "sector", "category", "current_quantity", "minimum_quantity", "location")
-    list_filter = ("sector", "category")
+    list_display = ("condominium", "name", "sector", "category", "current_quantity", "minimum_quantity", "location")
+    list_filter = ("condominium", "sector", "category")
     search_fields = ("name", "category", "location")
 
 
@@ -17,3 +17,4 @@ class StockMovementAdmin(admin.ModelAdmin):
     search_fields = ("item__name", "notes")
 
 # Register your models here.
+

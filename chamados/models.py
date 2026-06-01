@@ -1,4 +1,4 @@
-from django.conf import settings
+﻿from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -23,6 +23,7 @@ class Ticket(models.Model):
         AGUARDANDO_PECA = "aguardando_peca", "Aguardando peca"
         CONCLUIDO = "concluido", "Concluido"
 
+    condominium = models.ForeignKey("condominios.Condominium", null=True, blank=True, on_delete=models.PROTECT, related_name="tickets", verbose_name="condominio")
     sector = models.CharField("setor", max_length=30, choices=Sector.choices)
     description = models.TextField("descricao do problema")
     priority = models.CharField("prioridade", max_length=20, choices=Priority.choices, default=Priority.MEDIA)
@@ -70,3 +71,4 @@ class TicketNotification(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+

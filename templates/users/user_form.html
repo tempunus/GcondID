@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block content %}
 <section class="catalog-form-page">
   <div class="catalog-form-wrap">
@@ -18,6 +18,9 @@
         <div class="catalog-field">{{ form.email.label_tag }}{{ form.email }}{{ form.email.errors }}</div>
         <div class="catalog-field">{{ form.phone.label_tag }}{{ form.phone }}{{ form.phone.errors }}</div>
       </div>
+
+      <div class="catalog-section-title">Condominios autorizados</div>
+      <div class="catalog-choice-panel">{{ form.authorized_condominiums }}{{ form.authorized_condominiums.errors }}</div>
 
       <div class="catalog-section-title">Permissoes da conta</div>
       <div class="catalog-grid two">
@@ -45,3 +48,4 @@
   </div>
 </section>
 {% endblock %}
+

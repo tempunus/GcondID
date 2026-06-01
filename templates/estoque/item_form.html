@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block content %}
 <section class="catalog-form-page">
   <div class="catalog-form-wrap">
@@ -6,6 +6,8 @@
     <form method="post" class="catalog-form">
       {% csrf_token %}
       {{ form.non_field_errors }}
+      <div class="catalog-section-title">Condominio</div>
+      <div class="catalog-field">{{ form.condominium.label_tag }}{{ form.condominium }}{{ form.condominium.errors }}</div>
       <div class="catalog-section-title">Informacoes do item</div>
       <div class="catalog-grid two">
         <div class="catalog-field">{{ form.name.label_tag }}{{ form.name }}{{ form.name.errors }}</div>
@@ -29,3 +31,4 @@
   </div>
 </section>
 {% endblock %}
+

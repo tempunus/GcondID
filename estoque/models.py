@@ -1,4 +1,4 @@
-from django.conf import settings
+﻿from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -9,6 +9,7 @@ class StockItem(models.Model):
         LIMPEZA = "limpeza", "Limpeza"
         MANUTENCAO = "manutencao", "Manutencao"
 
+    condominium = models.ForeignKey("condominios.Condominium", null=True, blank=True, on_delete=models.PROTECT, related_name="stock_items", verbose_name="condominio")
     name = models.CharField("nome", max_length=150)
     category = models.CharField("categoria", max_length=120)
     sector = models.CharField("setor", max_length=30, choices=Sector.choices)
@@ -65,3 +66,4 @@ class StockMovement(models.Model):
         return f"{self.get_movement_type_display()} - {self.item} ({self.quantity})"
 
 # Create your models here.
+

@@ -1,4 +1,4 @@
-from io import BytesIO
+﻿from io import BytesIO
 
 from django.db.models import F
 from django.http import HttpResponse
@@ -19,44 +19,49 @@ def _user_name(user):
     return user.get_full_name() or user.email if user else "-"
 
 
+def _filter_by_user_condominiums(qs, user):
+    if user.is_gcondid_admin:
+        return qs
+    return qs.filter(condominium__in=user.authorized_condominiums.filter(is_active=True))
+
+
 def _date_range(request):
-    start = request.GET.get("start")
-    end = request.GET.get("end")
-    return start, end
+    return request.GET.get("start"), request.GET.get("end")
 
 
 def _rows(kind, request):
     if kind == "estoque":
-        qs = StockItem.objects.all()
+        qs = _filter_by_user_condominiums(StockItem.objects.select_related("condominium"), request.user)
         sector = request.GET.get("sector")
         if sector:
             qs = qs.filter(sector=sector)
-        return ["Nome", "Setor", "Categoria", "Atual", "Minima", "Localizacao"], [
-            [i.name, i.get_sector_display(), i.category, i.current_quantity, i.minimum_quantity, i.location] for i in qs
+        return ["Condominio", "Nome", "Setor", "Categoria", "Atual", "Minima", "Localizacao"], [
+            [i.condominium.name if i.condominium else "-", i.name, i.get_sector_display(), i.category, i.current_quantity, i.minimum_quantity, i.location] for i in qs
         ]
     if kind == "critico":
-        qs = StockItem.objects.filter(current_quantity__lte=F("minimum_quantity"))
-        return ["Nome", "Setor", "Atual", "Minima"], [[i.name, i.get_sector_display(), i.current_quantity, i.minimum_quantity] for i in qs]
+        qs = _filter_by_user_condominiums(StockItem.objects.select_related("condominium"), request.user).filter(current_quantity__lte=F("minimum_quantity"))
+        return ["Condominio", "Nome", "Setor", "Atual", "Minima"], [[i.condominium.name if i.condominium else "-", i.name, i.get_sector_display(), i.current_quantity, i.minimum_quantity] for i in qs]
     if kind == "movimentacoes":
-        qs = StockMovement.objects.select_related("item", "user")
+        qs = StockMovement.objects.select_related("item", "item__condominium", "user")
+        qs = _filter_by_user_condominiums(qs, request.user)
         start, end = _date_range(request)
         if start:
             qs = qs.filter(created_at__date__gte=start)
         if end:
             qs = qs.filter(created_at__date__lte=end)
-        return ["Data", "Item", "Tipo", "Quantidade", "Usuario"], [
-            [m.created_at.strftime("%d/%m/%Y %H:%M"), m.item.name, m.get_movement_type_display(), m.quantity, _user_name(m.user)] for m in qs
+        return ["Data", "Condominio", "Item", "Tipo", "Quantidade", "Usuario"], [
+            [m.created_at.strftime("%d/%m/%Y %H:%M"), m.item.condominium.name if m.item.condominium else "-", m.item.name, m.get_movement_type_display(), m.quantity, _user_name(m.user)] for m in qs
         ]
     if kind == "chamados":
-        qs = Ticket.objects.select_related("requester", "technician")
+        qs = _filter_by_user_condominiums(Ticket.objects.select_related("condominium", "requester", "technician"), request.user)
         for field in ("status", "sector", "technician"):
             value = request.GET.get(field)
             if value:
                 qs = qs.filter(**{field if field != "technician" else "technician_id": value})
-        return ["ID", "Setor", "Status", "Prioridade", "Solicitante", "Tecnico"], [
-            [t.id, t.get_sector_display(), t.get_status_display(), t.get_priority_display(), _user_name(t.requester), _user_name(t.technician)] for t in qs
+        return ["ID", "Condominio", "Setor", "Status", "Prioridade", "Solicitante", "Tecnico"], [
+            [t.id, t.condominium.name if t.condominium else "-", t.get_sector_display(), t.get_status_display(), t.get_priority_display(), _user_name(t.requester), _user_name(t.technician)] for t in qs
         ]
-    qs = User.objects.all()
+    qs = User.objects.all() if request.user.is_gcondid_admin else User.objects.none()
     return ["Nome", "Email", "Nivel", "Aprovado", "Bloqueado"], [
         [u.get_full_name(), u.email, u.get_access_level_display(), "Sim" if u.is_approved else "Nao", "Sim" if u.is_blocked else "Nao"] for u in qs
     ]
@@ -64,8 +69,8 @@ def _rows(kind, request):
 
 def _staff_allowed(request):
     user = request.user
-    if not user.is_authenticated or not user.can_access_panel or (not user.is_gcondid_admin and user.access_level != "funcionario"):
-        messages.warning(request, "Acesso restrito a administradores e funcionarios.")
+    if not user.is_authenticated or not user.can_access_panel or not user.has_condominium_access or (not user.is_gcondid_admin and user.access_level != "funcionario"):
+        messages.warning(request, "Acesso restrito ou sem condominio autorizado.")
         return False
     return True
 
@@ -116,7 +121,7 @@ def export_pdf(request, kind):
     y -= 18
     pdf.setFont("Helvetica", 8)
     for row in rows:
-        pdf.drawString(40, y, " | ".join(str(value)[:25] for value in row))
+        pdf.drawString(40, y, " | ".join(str(value)[:22] for value in row))
         y -= 16
         if y < 50:
             pdf.showPage()
@@ -127,4 +132,3 @@ def export_pdf(request, kind):
     response["Content-Disposition"] = f'attachment; filename="{kind}-{timezone.now():%Y%m%d}.pdf"'
     return response
 
-# Create your views here.

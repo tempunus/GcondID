@@ -16,9 +16,11 @@ urlpatterns = [
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('cadastro/', SignUpView.as_view(), name='signup'),
+    path('condominios/', include('condominios.urls')),
     path('usuarios/', include('users.urls')),
     path('estoque/', include('estoque.urls')),
     path('chamados/', include('chamados.urls')),
     path('relatorios/', include('relatorios.urls')),
     path('admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

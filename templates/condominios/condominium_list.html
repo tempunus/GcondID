@@ -1,0 +1,30 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3">Condominios</h1>
+  <a class="btn btn-primary" href="{% url 'condominios:create' %}">Novo condominio</a>
+</div>
+<div class="table-wrap p-3">
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>Nome</th><th>Cidade</th><th>UF</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      {% for condominium in condominiums %}
+        <tr>
+          <td>{{ condominium.name }}</td>
+          <td>{{ condominium.city|default:"-" }}</td>
+          <td>{{ condominium.state|default:"-" }}</td>
+          <td>{% if condominium.is_active %}<span class="badge text-bg-success">Ativo</span>{% else %}<span class="badge text-bg-secondary">Inativo</span>{% endif %}</td>
+          <td class="text-end">
+            <a class="btn btn-sm btn-primary" href="{% url 'condominios:edit' condominium.pk %}">Editar</a>
+            <a class="btn btn-sm btn-outline-danger" href="{% url 'condominios:delete' condominium.pk %}">Excluir</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5" class="text-secondary">Nenhum condominio cadastrado.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,12 +1,12 @@
-from django.contrib import admin
+﻿from django.contrib import admin
 
 from .models import Ticket, TicketNotification
 
 
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
-    list_display = ("id", "sector", "priority", "status", "requester", "technician", "created_at", "completed_at")
-    list_filter = ("sector", "priority", "status", "created_at")
+    list_display = ("id", "condominium", "sector", "priority", "status", "requester", "technician", "created_at", "completed_at")
+    list_filter = ("condominium", "sector", "priority", "status", "created_at")
     search_fields = (
         "description",
         "solution",
@@ -26,3 +26,4 @@ class TicketNotificationAdmin(admin.ModelAdmin):
     search_fields = ("ticket__description", "recipient__first_name", "recipient__last_name", "recipient__email", "response")
 
 # Register your models here.
+

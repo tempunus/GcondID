@@ -1,0 +1,30 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<section class="catalog-form-page">
+  <div class="catalog-form-wrap">
+    <h1>{% if object %}Editar Condominio{% else %}Cadastro de Condominio{% endif %}</h1>
+    <form method="post" class="catalog-form">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="catalog-section-title">Informacoes do condominio</div>
+      <div class="catalog-grid two">
+        <div class="catalog-field">{{ form.name.label_tag }}{{ form.name }}{{ form.name.errors }}</div>
+        <div class="catalog-field">{{ form.cnpj.label_tag }}{{ form.cnpj }}{{ form.cnpj.errors }}</div>
+      </div>
+      <div class="catalog-section-title">Localizacao</div>
+      <div class="catalog-grid two">
+        <div class="catalog-field">{{ form.address.label_tag }}{{ form.address }}{{ form.address.errors }}</div>
+        <div class="catalog-field">{{ form.city.label_tag }}{{ form.city }}{{ form.city.errors }}</div>
+      </div>
+      <div class="catalog-grid two mt-3">
+        <div class="catalog-field">{{ form.state.label_tag }}{{ form.state }}{{ form.state.errors }}</div>
+        <div class="catalog-check-grid"><label>{{ form.is_active }} <span>Ativo</span></label></div>
+      </div>
+      <div class="catalog-actions">
+        <a class="catalog-back" href="{% url 'condominios:list' %}">Voltar</a>
+        <button class="btn btn-primary">Salvar condominio</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

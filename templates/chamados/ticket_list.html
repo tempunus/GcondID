@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block content %}
 <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
   <h1 class="h3 mb-0">Chamados</h1>
@@ -12,17 +12,18 @@
 <div class="table-wrap p-3">
   <div class="table-responsive">
     <table class="table align-middle">
-      <thead><tr><th>#</th><th>Setor</th><th>Prioridade</th><th>Status</th><th>Solicitante</th><th>Responsavel</th><th></th></tr></thead>
+      <thead><tr><th>#</th><th>Condominio</th><th>Setor</th><th>Prioridade</th><th>Status</th><th>Solicitante</th><th>Responsavel</th><th></th></tr></thead>
       <tbody>
       {% for ticket in tickets %}
         <tr>
-          <td>{{ ticket.id }}</td><td>{{ ticket.get_sector_display }}</td><td>{{ ticket.get_priority_display }}</td>
+          <td>{{ ticket.id }}</td><td>{{ ticket.condominium|default:"-" }}</td><td>{{ ticket.get_sector_display }}</td><td>{{ ticket.get_priority_display }}</td>
           <td><span class="badge badge-blue">{{ ticket.get_status_display }}</span></td><td>{{ ticket.requester }}</td><td>{{ ticket.technician|default:"-" }}</td>
           <td class="text-end"><a class="btn btn-sm btn-outline-light" href="{% url 'chamados:detail' ticket.pk %}">Ver</a>{% if request.user.access_level != 'visitante' or request.user.is_gcondid_admin %} <a class="btn btn-sm btn-primary" href="{% url 'chamados:edit' ticket.pk %}">Editar</a>{% endif %}</td>
         </tr>
-      {% empty %}<tr><td colspan="7" class="text-secondary">Nenhum chamado encontrado.</td></tr>{% endfor %}
+      {% empty %}<tr><td colspan="8" class="text-secondary">Nenhum chamado encontrado.</td></tr>{% endfor %}
       </tbody>
     </table>
   </div>
 </div>
 {% endblock %}
+

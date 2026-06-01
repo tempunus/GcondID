@@ -1,4 +1,4 @@
-from django import forms
+﻿from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 from .models import User
@@ -18,6 +18,11 @@ class EmailAuthenticationForm(AuthenticationForm):
             raise forms.ValidationError(
                 "Sua conta esta pendente, bloqueada ou inativa. Aguarde a aprovacao do administrador.",
                 code="inactive",
+            )
+        if not user.has_condominium_access:
+            raise forms.ValidationError(
+                "Voce nao tem acesso autorizado a nenhum condominio. Solicite liberacao ao administrador.",
+                code="no_condominium_access",
             )
 
 
@@ -60,12 +65,14 @@ class AdminUserCreateForm(UserCreationForm):
             "email",
             "phone",
             "access_level",
+            "authorized_condominiums",
             "is_approved",
             "is_blocked",
             "is_active",
             "password1",
             "password2",
         )
+        widgets = {"authorized_condominiums": forms.CheckboxSelectMultiple}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -73,21 +80,25 @@ class AdminUserCreateForm(UserCreationForm):
         self.fields["last_name"].required = True
         self.fields["is_approved"].initial = True
         self.fields["is_active"].initial = True
+        self.fields["authorized_condominiums"].label = "Condominios autorizados"
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.username = user.email
         if commit:
             user.save()
+            self.save_m2m()
         return user
 
 
 class UserApprovalForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "email", "phone", "access_level", "is_approved", "is_blocked", "is_active")
+        fields = ("first_name", "last_name", "email", "phone", "access_level", "authorized_condominiums", "is_approved", "is_blocked", "is_active")
+        widgets = {"authorized_condominiums": forms.CheckboxSelectMultiple}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["first_name"].required = True
         self.fields["last_name"].required = True
+        self.fields["authorized_condominiums"].label = "Condominios autorizados"

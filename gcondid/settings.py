@@ -150,6 +150,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    'condominios',
     'users',
     'estoque',
     'chamados',
@@ -176,6 +177,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "gcondid.wsgi.application"
+
 
 
 
