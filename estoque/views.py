@@ -16,6 +16,12 @@ def _filter_by_user_condominiums(qs, user):
     return qs.filter(condominium__in=user.authorized_condominiums.filter(is_active=True))
 
 
+def _filter_movements_by_user_condominiums(qs, user):
+    if user.is_gcondid_admin:
+        return qs
+    return qs.filter(item__condominium__in=user.authorized_condominiums.filter(is_active=True))
+
+
 class StockItemListView(StaffRequiredMixin, ListView):
     model = StockItem
     template_name = "estoque/item_list.html"
@@ -101,4 +107,3 @@ class StockEntryView(StockMovementView):
 
 class StockExitView(StockMovementView):
     movement_type = StockMovement.MovementType.SAIDA
-

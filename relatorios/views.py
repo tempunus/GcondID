@@ -132,3 +132,4 @@ def export_pdf(request, kind):
     response["Content-Disposition"] = f'attachment; filename="{kind}-{timezone.now():%Y%m%d}.pdf"'
     return response
 
+

@@ -13,6 +13,12 @@ def _filter_by_user_condominiums(qs, user):
     return qs.filter(condominium__in=user.authorized_condominiums.filter(is_active=True))
 
 
+def _filter_movements_by_user_condominiums(qs, user):
+    if user.is_gcondid_admin:
+        return qs
+    return qs.filter(item__condominium__in=user.authorized_condominiums.filter(is_active=True))
+
+
 class DashboardView(ApprovedUserRequiredMixin, TemplateView):
     template_name = "dashboard/index.html"
 
@@ -34,4 +40,3 @@ class DashboardView(ApprovedUserRequiredMixin, TemplateView):
             }
         )
         return context
-
