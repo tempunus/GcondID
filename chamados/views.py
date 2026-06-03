@@ -1,12 +1,20 @@
-﻿from django.contrib import messages
+from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
+from condominios.models import Condominium
 from users.mixins import ApprovedUserRequiredMixin, StaffRequiredMixin
 
 from .forms import TicketCreateForm, TicketUpdateForm
 from .models import Ticket
 from .notifications import notify_ticket_assignee
+
+
+def _authorized_condominiums(user):
+    qs = Condominium.objects.filter(is_active=True).order_by("name")
+    if user.is_gcondid_admin:
+        return qs
+    return user.authorized_condominiums.filter(is_active=True).order_by("name")
 
 
 def _filter_by_user_condominiums(qs, user):
@@ -27,7 +35,10 @@ class TicketListView(ApprovedUserRequiredMixin, ListView):
             qs = qs.filter(requester=user)
         status = self.request.GET.get("status")
         sector = self.request.GET.get("sector")
+        condominium = self.request.GET.get("condominium")
         technician = self.request.GET.get("technician")
+        if condominium:
+            qs = qs.filter(condominium_id=condominium)
         if status:
             qs = qs.filter(status=status)
         if sector:
@@ -40,6 +51,10 @@ class TicketListView(ApprovedUserRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["statuses"] = Ticket.Status.choices
         context["sectors"] = Ticket.Sector.choices
+        context["condominiums"] = _authorized_condominiums(self.request.user)
+        context["selected_status"] = self.request.GET.get("status", "")
+        context["selected_sector"] = self.request.GET.get("sector", "")
+        context["selected_condominium"] = self.request.GET.get("condominium", "")
         return context
 
 

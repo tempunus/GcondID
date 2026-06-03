@@ -1,10 +1,11 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block content %}
 <section class="catalog-form-page">
   <div class="catalog-form-wrap">
     <h1>{% if object %}Editar Item{% else %}Cadastro de Item{% endif %}</h1>
     <form method="post" class="catalog-form">
       {% csrf_token %}
+      {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
       {{ form.non_field_errors }}
       <div class="catalog-section-title">Condominio</div>
       <div class="catalog-field">{{ form.condominium.label_tag }}{{ form.condominium }}{{ form.condominium.errors }}</div>
@@ -24,11 +25,10 @@
         <div class="catalog-field">{{ form.minimum_quantity.label_tag }}{{ form.minimum_quantity }}{{ form.minimum_quantity.errors }}</div>
       </div>
       <div class="catalog-actions">
-        <a class="catalog-back" href="{% url 'estoque:list' %}">Voltar</a>
+        <a class="catalog-back" href="{{ next_url|default:'/estoque/' }}">Voltar</a>
         <button class="btn btn-primary">Salvar item</button>
       </div>
     </form>
   </div>
 </section>
 {% endblock %}
-

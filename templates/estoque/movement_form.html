@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="catalog-form-page">
+  <div class="catalog-form-wrap">
+    <h1>{% if movement_type == 'entrada' %}Entrada de Estoque{% else %}Baixa de Estoque{% endif %}</h1>
+    <form method="post" class="catalog-form">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next_url }}">
+      {{ form.non_field_errors }}
+      <div class="catalog-section-title">Item selecionado</div>
+      <div class="catalog-highlight">
+        <strong>{{ item.name }}</strong>
+        <span>{{ item.condominium|default:"-" }} - {{ item.get_sector_display }} - Quantidade atual: {{ item.current_quantity }}</span>
+      </div>
+      <div class="catalog-section-title">Movimentacao</div>
+      <div class="catalog-grid two">
+        <div class="catalog-field">{{ form.quantity.label_tag }}{{ form.quantity }}{{ form.quantity.errors }}</div>
+        <div class="catalog-field">{{ form.notes.label_tag }}{{ form.notes }}{{ form.notes.errors }}</div>
+      </div>
+      <div class="catalog-actions">
+        <a class="catalog-back" href="{{ next_url }}">Voltar</a>
+        <button class="btn btn-primary">Salvar movimentacao</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

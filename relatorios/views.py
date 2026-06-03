@@ -1,4 +1,4 @@
-﻿from io import BytesIO
+from io import BytesIO
 
 from django.db.models import F
 from django.http import HttpResponse
@@ -11,6 +11,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
 from chamados.models import Ticket
+from condominios.models import Condominium
 from estoque.models import StockItem, StockMovement
 from users.models import User
 
@@ -19,10 +20,30 @@ def _user_name(user):
     return user.get_full_name() or user.email if user else "-"
 
 
+def _authorized_condominiums(user):
+    qs = Condominium.objects.filter(is_active=True).order_by("name")
+    if user.is_gcondid_admin:
+        return qs
+    return user.authorized_condominiums.filter(is_active=True).order_by("name")
+
+
 def _filter_by_user_condominiums(qs, user):
     if user.is_gcondid_admin:
         return qs
     return qs.filter(condominium__in=user.authorized_condominiums.filter(is_active=True))
+
+
+def _filter_movements_by_user_condominiums(qs, user):
+    if user.is_gcondid_admin:
+        return qs
+    return qs.filter(item__condominium__in=user.authorized_condominiums.filter(is_active=True))
+
+
+def _apply_condominium_filter(qs, request, field="condominium_id"):
+    condominium = request.GET.get("condominium")
+    if condominium:
+        return qs.filter(**{field: condominium})
+    return qs
 
 
 def _date_range(request):
@@ -32,6 +53,7 @@ def _date_range(request):
 def _rows(kind, request):
     if kind == "estoque":
         qs = _filter_by_user_condominiums(StockItem.objects.select_related("condominium"), request.user)
+        qs = _apply_condominium_filter(qs, request)
         sector = request.GET.get("sector")
         if sector:
             qs = qs.filter(sector=sector)
@@ -40,20 +62,26 @@ def _rows(kind, request):
         ]
     if kind == "critico":
         qs = _filter_by_user_condominiums(StockItem.objects.select_related("condominium"), request.user).filter(current_quantity__lte=F("minimum_quantity"))
+        qs = _apply_condominium_filter(qs, request)
         return ["Condominio", "Nome", "Setor", "Atual", "Minima"], [[i.condominium.name if i.condominium else "-", i.name, i.get_sector_display(), i.current_quantity, i.minimum_quantity] for i in qs]
     if kind == "movimentacoes":
         qs = StockMovement.objects.select_related("item", "item__condominium", "user")
-        qs = _filter_by_user_condominiums(qs, request.user)
+        qs = _filter_movements_by_user_condominiums(qs, request.user)
+        qs = _apply_condominium_filter(qs, request, "item__condominium_id")
+        sector = request.GET.get("sector")
+        if sector:
+            qs = qs.filter(item__sector=sector)
         start, end = _date_range(request)
         if start:
             qs = qs.filter(created_at__date__gte=start)
         if end:
             qs = qs.filter(created_at__date__lte=end)
-        return ["Data", "Condominio", "Item", "Tipo", "Quantidade", "Usuario"], [
-            [m.created_at.strftime("%d/%m/%Y %H:%M"), m.item.condominium.name if m.item.condominium else "-", m.item.name, m.get_movement_type_display(), m.quantity, _user_name(m.user)] for m in qs
+        return ["Data", "Condominio", "Item", "Setor", "Tipo", "Quantidade", "Usuario"], [
+            [m.created_at.strftime("%d/%m/%Y %H:%M"), m.item.condominium.name if m.item.condominium else "-", m.item.name, m.item.get_sector_display(), m.get_movement_type_display(), m.quantity, _user_name(m.user)] for m in qs
         ]
     if kind == "chamados":
         qs = _filter_by_user_condominiums(Ticket.objects.select_related("condominium", "requester", "technician"), request.user)
+        qs = _apply_condominium_filter(qs, request)
         for field in ("status", "sector", "technician"):
             value = request.GET.get(field)
             if value:
@@ -82,7 +110,13 @@ def reports_index(request):
     return render(
         request,
         "relatorios/index.html",
-        {"sectors": StockItem.Sector.choices, "ticket_statuses": Ticket.Status.choices, "ticket_sectors": Ticket.Sector.choices, "technicians": User.objects.filter(access_level__in=["admin", "funcionario"]).order_by("first_name", "last_name", "email")},
+        {
+            "condominiums": _authorized_condominiums(request.user),
+            "sectors": StockItem.Sector.choices,
+            "ticket_statuses": Ticket.Status.choices,
+            "ticket_sectors": Ticket.Sector.choices,
+            "technicians": User.objects.filter(access_level__in=["admin", "funcionario"]).order_by("first_name", "last_name", "email"),
+        },
     )
 
 
@@ -131,5 +165,3 @@ def export_pdf(request, kind):
     response = HttpResponse(output.getvalue(), content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{kind}-{timezone.now():%Y%m%d}.pdf"'
     return response
-
-

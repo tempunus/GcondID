@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="catalog-form-page">
+  <div class="catalog-form-wrap">
+    <h1>Excluir Item</h1>
+    <form method="post" class="catalog-form">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next_url }}">
+      <div class="catalog-section-title">Confirmacao</div>
+      <div class="catalog-highlight">
+        <strong>{{ object.name }}</strong>
+        <span>{{ object.condominium|default:"-" }} - {{ object.get_sector_display }} - Quantidade atual: {{ object.current_quantity }}</span>
+      </div>
+      <div class="catalog-actions">
+        <a class="catalog-back" href="{{ next_url }}">Cancelar</a>
+        <button class="btn btn-primary">Excluir item</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
