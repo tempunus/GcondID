@@ -27,6 +27,14 @@ def _authorized_condominiums(user):
     return user.authorized_condominiums.filter(is_active=True).order_by("name")
 
 
+def _condominium_allowed(user, condominium_id):
+    if not condominium_id:
+        return True
+    if user.is_gcondid_admin:
+        return Condominium.objects.filter(pk=condominium_id, is_active=True).exists()
+    return user.authorized_condominiums.filter(pk=condominium_id, is_active=True).exists()
+
+
 def _filter_by_user_condominiums(qs, user):
     if user.is_gcondid_admin:
         return qs
@@ -41,9 +49,12 @@ def _filter_movements_by_user_condominiums(qs, user):
 
 def _apply_condominium_filter(qs, request, field="condominium_id"):
     condominium = request.GET.get("condominium")
-    if condominium:
-        return qs.filter(**{field: condominium})
-    return qs
+    if not condominium:
+        return qs
+    if not _condominium_allowed(request.user, condominium):
+        messages.warning(request, "Voce nao tem autorizacao para acessar este condominio.")
+        return qs.none()
+    return qs.filter(**{field: condominium})
 
 
 def _date_range(request):

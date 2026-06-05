@@ -19,6 +19,14 @@ def _authorized_condominiums(user):
     return user.authorized_condominiums.filter(is_active=True).order_by("name")
 
 
+def _condominium_allowed(user, condominium_id):
+    if not condominium_id:
+        return True
+    if user.is_gcondid_admin:
+        return Condominium.objects.filter(pk=condominium_id, is_active=True).exists()
+    return user.authorized_condominiums.filter(pk=condominium_id, is_active=True).exists()
+
+
 def _filter_by_user_condominiums(qs, user):
     if user.is_gcondid_admin:
         return qs
@@ -56,6 +64,9 @@ class StockItemListView(StaffRequiredMixin, ListView):
         condominium = self.request.GET.get("condominium")
         critical = self.request.GET.get("critical")
         if condominium:
+            if not _condominium_allowed(self.request.user, condominium):
+                messages.warning(self.request, "Voce nao tem autorizacao para acessar este condominio.")
+                return qs.none()
             qs = qs.filter(condominium_id=condominium)
         if sector:
             qs = qs.filter(sector=sector)
@@ -72,7 +83,7 @@ class StockItemListView(StaffRequiredMixin, ListView):
         context["critical"] = self.request.GET.get("critical", "")
         movements = StockMovement.objects.select_related("item", "item__condominium", "user")
         movements = _filter_movements_by_user_condominiums(movements, self.request.user)
-        if context["selected_condominium"]:
+        if context["selected_condominium"] and _condominium_allowed(self.request.user, context["selected_condominium"]):
             movements = movements.filter(item__condominium_id=context["selected_condominium"])
         if context["selected_sector"]:
             movements = movements.filter(item__sector=context["selected_sector"])
