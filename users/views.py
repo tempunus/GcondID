@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.db.models.deletion import ProtectedError
 from django.views import View
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect
@@ -76,5 +77,13 @@ class UserDeleteView(PermissaoRequiredMixin, AdminRequiredMixin, DeleteView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        try:
+            response = super().form_valid(form)
+        except ProtectedError:
+            messages.error(
+                self.request,
+                "Nao foi possivel excluir este usuario porque ele possui registros vinculados, como chamados abertos. Bloqueie ou desative a conta para impedir novos acessos.",
+            )
+            return redirect("users:list")
         messages.success(self.request, "Usuario excluido.")
-        return super().form_valid(form)
+        return response
