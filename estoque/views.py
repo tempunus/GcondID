@@ -6,7 +6,8 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView, View
 
 from condominios.models import Condominium
-from users.mixins import StaffRequiredMixin
+from permissoes.mixins import PermissaoRequiredMixin
+from users.mixins import ApprovedUserRequiredMixin
 
 from .forms import StockItemForm, StockMovementForm
 from .models import StockItem, StockMovement
@@ -53,7 +54,8 @@ def _item_sector_url(item):
     return url
 
 
-class StockItemListView(StaffRequiredMixin, ListView):
+class StockItemListView(PermissaoRequiredMixin, ApprovedUserRequiredMixin, ListView):
+    permissao_required = "acessar_estoque"
     model = StockItem
     template_name = "estoque/item_list.html"
     context_object_name = "items"
@@ -91,7 +93,8 @@ class StockItemListView(StaffRequiredMixin, ListView):
         return context
 
 
-class StockItemCreateView(StaffRequiredMixin, CreateView):
+class StockItemCreateView(PermissaoRequiredMixin, ApprovedUserRequiredMixin, CreateView):
+    permissao_required = "cadastrar_produtos"
     model = StockItem
     form_class = StockItemForm
     template_name = "estoque/item_form.html"
@@ -103,7 +106,8 @@ class StockItemCreateView(StaffRequiredMixin, CreateView):
         return kwargs
 
 
-class StockItemUpdateView(StaffRequiredMixin, UpdateView):
+class StockItemUpdateView(PermissaoRequiredMixin, ApprovedUserRequiredMixin, UpdateView):
+    permissao_required = "editar_produtos"
     model = StockItem
     form_class = StockItemForm
     template_name = "estoque/item_form.html"
@@ -125,7 +129,8 @@ class StockItemUpdateView(StaffRequiredMixin, UpdateView):
         return _safe_next_url(self.request)
 
 
-class StockItemDeleteView(StaffRequiredMixin, DeleteView):
+class StockItemDeleteView(PermissaoRequiredMixin, ApprovedUserRequiredMixin, DeleteView):
+    permissao_required = "excluir_produtos"
     model = StockItem
     template_name = "estoque/item_confirm_delete.html"
 
@@ -145,7 +150,8 @@ class StockItemDeleteView(StaffRequiredMixin, DeleteView):
         return super().form_valid(form)
 
 
-class StockMovementView(StaffRequiredMixin, View):
+class StockMovementView(PermissaoRequiredMixin, ApprovedUserRequiredMixin, View):
+    permissao_required = "movimentar_estoque"
     movement_type = None
     template_name = "estoque/movement_form.html"
 

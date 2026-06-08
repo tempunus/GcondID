@@ -11,6 +11,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
 from chamados.models import Ticket
+from permissoes.decorators import tem_permissao
 from condominios.models import Condominium
 from estoque.models import StockItem, StockMovement
 from users.models import User
@@ -108,13 +109,14 @@ def _rows(kind, request):
 
 def _staff_allowed(request):
     user = request.user
-    if not user.is_authenticated or not user.can_access_panel or not user.has_condominium_access or (not user.is_gcondid_admin and user.access_level != "funcionario"):
+    if not user.is_authenticated or not user.can_access_panel or not user.has_condominium_access :
         messages.warning(request, "Acesso restrito ou sem condominio autorizado.")
         return False
     return True
 
 
 @login_required
+@tem_permissao("visualizar_relatorios")
 def reports_index(request):
     if not _staff_allowed(request):
         return redirect("dashboard")
@@ -132,6 +134,7 @@ def reports_index(request):
 
 
 @login_required
+@tem_permissao("visualizar_relatorios")
 def export_excel(request, kind):
     if not _staff_allowed(request):
         return redirect("dashboard")
@@ -150,6 +153,7 @@ def export_excel(request, kind):
 
 
 @login_required
+@tem_permissao("visualizar_relatorios")
 def export_pdf(request, kind):
     if not _staff_allowed(request):
         return redirect("dashboard")

@@ -1,24 +1,22 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{% load permissoes %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h1 class="h3 mb-0">Chamado #{{ ticket.id }}</h1>
-  {% if request.user.access_level != 'visitante' or request.user.is_gcondid_admin %}<a class="btn btn-primary" href="{% url 'chamados:edit' ticket.pk %}">Editar</a>{% endif %}
+  {% if request.user|possui_permissao:'editar_chamados' %}<a class="btn btn-primary" href="{% url 'chamados:edit' ticket.pk %}">Editar</a>{% endif %}
 </div>
 <div class="content-card p-3">
-  <div class="row g-3">
-    <div class="col-md-8">
-      <p><strong>Setor:</strong> {{ ticket.get_sector_display }}</p>
-      <p><strong>Status:</strong> {{ ticket.get_status_display }}</p>
-      <p><strong>Prioridade:</strong> {{ ticket.get_priority_display }}</p>
-      <p><strong>Responsavel:</strong> {{ ticket.technician|default:"-" }}</p>
-      <p><strong>Descricao:</strong><br>{{ ticket.description|linebreaksbr }}</p>
-      {% if ticket.solution %}<p><strong>Solucao aplicada:</strong><br>{{ ticket.solution|linebreaksbr }}</p>{% endif %}
-      {% if ticket.completed_at %}<p><strong>Conclusao:</strong> {{ ticket.completed_at|date:"d/m/Y H:i" }}</p>{% endif %}
-    </div>
-    <div class="col-md-4">
-      {% if ticket.opening_photo %}<p class="mb-2">Foto de abertura</p><img class="thumb mb-3" src="{{ ticket.opening_photo.url }}" alt="Foto de abertura">{% endif %}
-      {% if ticket.completion_photo %}<p class="mb-2">Foto de conclusao</p><img class="thumb" src="{{ ticket.completion_photo.url }}" alt="Foto de conclusao">{% endif %}
-    </div>
-  </div>
+  <dl class="row mb-0">
+    <dt class="col-sm-3">Condominio</dt><dd class="col-sm-9">{{ ticket.condominium|default:"-" }}</dd>
+    <dt class="col-sm-3">Setor</dt><dd class="col-sm-9">{{ ticket.get_sector_display }}</dd>
+    <dt class="col-sm-3">Prioridade</dt><dd class="col-sm-9">{{ ticket.get_priority_display }}</dd>
+    <dt class="col-sm-3">Status</dt><dd class="col-sm-9">{{ ticket.get_status_display }}</dd>
+    <dt class="col-sm-3">Solicitante</dt><dd class="col-sm-9">{{ ticket.requester }}</dd>
+    <dt class="col-sm-3">Responsavel</dt><dd class="col-sm-9">{{ ticket.technician|default:"-" }}</dd>
+    <dt class="col-sm-3">Descricao</dt><dd class="col-sm-9">{{ ticket.description }}</dd>
+    <dt class="col-sm-3">Solucao</dt><dd class="col-sm-9">{{ ticket.solution|default:"-" }}</dd>
+    {% if ticket.opening_photo %}<dt class="col-sm-3">Foto de abertura</dt><dd class="col-sm-9"><img class="thumb" src="{{ ticket.opening_photo.url }}" alt="Foto de abertura"></dd>{% endif %}
+    {% if ticket.completion_photo %}<dt class="col-sm-3">Foto de conclusao</dt><dd class="col-sm-9"><img class="thumb" src="{{ ticket.completion_photo.url }}" alt="Foto de conclusao"></dd>{% endif %}
+  </dl>
 </div>
 {% endblock %}

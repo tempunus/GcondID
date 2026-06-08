@@ -1,4 +1,4 @@
-﻿{% load static %}
+﻿{% load static permissoes %}
 <!doctype html>
 <html lang="pt-br">
 <head>
@@ -24,14 +24,11 @@
     </div>
     <nav class="nav flex-column gap-1">
       <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-      {% if request.user.is_gcondid_admin %}<a class="nav-link" href="{% url 'condominios:list' %}">Condominios</a><a class="nav-link" href="{% url 'users:list' %}">Usuarios</a>{% endif %}
-      {% if request.user.access_level != 'visitante' or request.user.is_gcondid_admin %}
-      <a class="nav-link" href="{% url 'estoque:list' %}">Estoque</a>
-      {% endif %}
-      <a class="nav-link" href="{% url 'chamados:list' %}">Chamados</a>
-      {% if request.user.access_level != 'visitante' or request.user.is_gcondid_admin %}
-      <a class="nav-link" href="{% url 'relatorios:index' %}">Relatorios</a>
-      {% endif %}
+      {% if request.user|possui_permissao:'administrar_condominio' and request.user.is_gcondid_admin %}<a class="nav-link" href="{% url 'condominios:list' %}">Condominios</a>{% endif %}
+      {% if request.user|possui_permissao:'visualizar_usuarios' and request.user.is_gcondid_admin %}<a class="nav-link" href="{% url 'users:list' %}">Usuarios</a>{% endif %}
+      {% if request.user|possui_permissao:'acessar_estoque' %}<a class="nav-link" href="{% url 'estoque:list' %}">Estoque</a>{% endif %}
+      {% if request.user|possui_permissao:'visualizar_chamados' %}<a class="nav-link" href="{% url 'chamados:list' %}">Chamados</a>{% endif %}
+      {% if request.user|possui_permissao:'visualizar_relatorios' %}<a class="nav-link" href="{% url 'relatorios:index' %}">Relatorios</a>{% endif %}
     </nav>
     <div class="mt-auto pt-4">
       <div class="small text-secondary mb-2">{{ request.user }}</div>
@@ -51,10 +48,11 @@
     </div>
     <nav class="mobile-nav d-lg-none mb-3">
       <a href="{% url 'dashboard' %}">Dashboard</a>
-      {% if request.user.is_gcondid_admin %}<a href="{% url 'condominios:list' %}">Condominios</a><a href="{% url 'users:list' %}">Usuarios</a>{% endif %}
-      {% if request.user.access_level != 'visitante' or request.user.is_gcondid_admin %}<a href="{% url 'estoque:list' %}">Estoque</a>{% endif %}
-      <a href="{% url 'chamados:list' %}">Chamados</a>
-      {% if request.user.access_level != 'visitante' or request.user.is_gcondid_admin %}<a href="{% url 'relatorios:index' %}">Relatorios</a>{% endif %}
+      {% if request.user|possui_permissao:'administrar_condominio' and request.user.is_gcondid_admin %}<a href="{% url 'condominios:list' %}">Condominios</a>{% endif %}
+      {% if request.user|possui_permissao:'visualizar_usuarios' and request.user.is_gcondid_admin %}<a href="{% url 'users:list' %}">Usuarios</a>{% endif %}
+      {% if request.user|possui_permissao:'acessar_estoque' %}<a href="{% url 'estoque:list' %}">Estoque</a>{% endif %}
+      {% if request.user|possui_permissao:'visualizar_chamados' %}<a href="{% url 'chamados:list' %}">Chamados</a>{% endif %}
+      {% if request.user|possui_permissao:'visualizar_relatorios' %}<a href="{% url 'relatorios:index' %}">Relatorios</a>{% endif %}
     </nav>
     {% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}
     {% block content %}{% endblock %}
@@ -65,5 +63,3 @@
 <script src="{% static 'js/pwa.js' %}"></script>
 </body>
 </html>
-
-

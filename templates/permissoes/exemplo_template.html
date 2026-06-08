@@ -1,0 +1,4 @@
+﻿{% load permissoes %}
+{% if user|possui_permissao:'cadastrar_produtos' %}
+<a href="#">Novo Produto</a>
+{% endif %}

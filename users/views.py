@@ -5,6 +5,8 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
+from permissoes.mixins import PermissaoRequiredMixin
+
 from .forms import AdminUserCreateForm, EmailAuthenticationForm, UserApprovalForm
 from .mixins import AdminRequiredMixin
 from .models import User
@@ -25,7 +27,8 @@ class SignUpView(View):
         return redirect("login")
 
 
-class UserListView(AdminRequiredMixin, ListView):
+class UserListView(PermissaoRequiredMixin, AdminRequiredMixin, ListView):
+    permissao_required = "visualizar_usuarios"
     model = User
     template_name = "users/user_list.html"
     context_object_name = "users"
@@ -35,7 +38,8 @@ class UserListView(AdminRequiredMixin, ListView):
         return User.objects.order_by("is_approved", "first_name", "email")
 
 
-class UserCreateView(AdminRequiredMixin, CreateView):
+class UserCreateView(PermissaoRequiredMixin, AdminRequiredMixin, CreateView):
+    permissao_required = "cadastrar_usuarios"
     model = User
     form_class = AdminUserCreateForm
     template_name = "users/user_form.html"
@@ -46,7 +50,8 @@ class UserCreateView(AdminRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class UserUpdateView(AdminRequiredMixin, UpdateView):
+class UserUpdateView(PermissaoRequiredMixin, AdminRequiredMixin, UpdateView):
+    permissao_required = "editar_usuarios"
     model = User
     form_class = UserApprovalForm
     template_name = "users/user_form.html"
@@ -57,7 +62,8 @@ class UserUpdateView(AdminRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class UserDeleteView(AdminRequiredMixin, DeleteView):
+class UserDeleteView(PermissaoRequiredMixin, AdminRequiredMixin, DeleteView):
+    permissao_required = "excluir_usuarios"
     model = User
     template_name = "users/user_confirm_delete.html"
     success_url = reverse_lazy("users:list")

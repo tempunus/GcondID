@@ -1,9 +1,12 @@
 from django.contrib import messages
 from django.urls import reverse_lazy
+from django.core.exceptions import PermissionDenied
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from condominios.models import Condominium
-from users.mixins import ApprovedUserRequiredMixin, StaffRequiredMixin
+from permissoes.mixins import PermissaoRequiredMixin
+from permissoes.utils import usuario_tem_permissao
+from users.mixins import ApprovedUserRequiredMixin
 
 from .forms import TicketCreateForm, TicketUpdateForm
 from .models import Ticket
@@ -31,7 +34,8 @@ def _filter_by_user_condominiums(qs, user):
     return qs.filter(condominium__in=user.authorized_condominiums.filter(is_active=True))
 
 
-class TicketListView(ApprovedUserRequiredMixin, ListView):
+class TicketListView(PermissaoRequiredMixin, ApprovedUserRequiredMixin, ListView):
+    permissao_required = "visualizar_chamados"
     model = Ticket
     template_name = "chamados/ticket_list.html"
     context_object_name = "tickets"
@@ -69,7 +73,8 @@ class TicketListView(ApprovedUserRequiredMixin, ListView):
         return context
 
 
-class TicketCreateView(ApprovedUserRequiredMixin, CreateView):
+class TicketCreateView(PermissaoRequiredMixin, ApprovedUserRequiredMixin, CreateView):
+    permissao_required = "abrir_chamados"
     model = Ticket
     form_class = TicketCreateForm
     template_name = "chamados/ticket_form.html"
@@ -88,7 +93,8 @@ class TicketCreateView(ApprovedUserRequiredMixin, CreateView):
         return response
 
 
-class TicketUpdateView(StaffRequiredMixin, UpdateView):
+class TicketUpdateView(PermissaoRequiredMixin, ApprovedUserRequiredMixin, UpdateView):
+    permissao_required = "editar_chamados"
     model = Ticket
     form_class = TicketUpdateForm
     template_name = "chamados/ticket_form.html"
@@ -113,7 +119,8 @@ class TicketUpdateView(StaffRequiredMixin, UpdateView):
         return response
 
 
-class TicketDetailView(ApprovedUserRequiredMixin, DetailView):
+class TicketDetailView(PermissaoRequiredMixin, ApprovedUserRequiredMixin, DetailView):
+    permissao_required = "visualizar_chamados"
     model = Ticket
     template_name = "chamados/ticket_detail.html"
     context_object_name = "ticket"

@@ -1,4 +1,4 @@
-﻿import os
+import os
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 from urllib.parse import unquote, urlparse
@@ -150,6 +150,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    'permissoes',
     'condominios',
     'users',
     'estoque',
@@ -177,7 +178,3 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "gcondid.wsgi.application"
-
-
-
-

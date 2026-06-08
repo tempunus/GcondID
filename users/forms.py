@@ -1,5 +1,7 @@
-﻿from django import forms
+from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+
+from permissoes.models import PerfilAcesso, UsuarioPerfil
 
 from .models import User
 
@@ -56,7 +58,28 @@ class SignUpForm(UserCreationForm):
         return user
 
 
-class AdminUserCreateForm(UserCreationForm):
+class PerfilUsuarioFormMixin:
+    perfil = forms.ModelChoiceField(
+        label="Perfil de acesso",
+        queryset=PerfilAcesso.objects.all(),
+        required=True,
+        help_text="Define exatamente quais telas e funcionalidades o usuario podera acessar.",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["perfil"].queryset = PerfilAcesso.objects.order_by("nome")
+        perfil_usuario = getattr(self.instance, "perfil_acesso", None) if getattr(self, "instance", None) else None
+        if perfil_usuario:
+            self.fields["perfil"].initial = perfil_usuario.perfil
+
+    def save_usuario_perfil(self, user):
+        perfil = self.cleaned_data.get("perfil")
+        if perfil:
+            UsuarioPerfil.objects.update_or_create(usuario=user, defaults={"perfil": perfil})
+
+
+class AdminUserCreateForm(PerfilUsuarioFormMixin, UserCreationForm):
     class Meta:
         model = User
         fields = (
@@ -88,10 +111,11 @@ class AdminUserCreateForm(UserCreationForm):
         if commit:
             user.save()
             self.save_m2m()
+            self.save_usuario_perfil(user)
         return user
 
 
-class UserApprovalForm(forms.ModelForm):
+class UserApprovalForm(PerfilUsuarioFormMixin, forms.ModelForm):
     class Meta:
         model = User
         fields = ("first_name", "last_name", "email", "phone", "access_level", "authorized_condominiums", "is_approved", "is_blocked", "is_active")
@@ -102,3 +126,9 @@ class UserApprovalForm(forms.ModelForm):
         self.fields["first_name"].required = True
         self.fields["last_name"].required = True
         self.fields["authorized_condominiums"].label = "Condominios autorizados"
+
+    def save(self, commit=True):
+        user = super().save(commit=commit)
+        if commit:
+            self.save_usuario_perfil(user)
+        return user
