@@ -68,6 +68,13 @@ class PerfilUsuarioFormMixin:
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if "perfil" not in self.fields:
+            self.fields["perfil"] = forms.ModelChoiceField(
+                label="Perfil de acesso",
+                queryset=PerfilAcesso.objects.none(),
+                required=True,
+                help_text="Define exatamente quais telas e funcionalidades o usuario podera acessar.",
+            )
         self.fields["perfil"].queryset = PerfilAcesso.objects.order_by("nome")
         perfil_usuario = getattr(self.instance, "perfil_acesso", None) if getattr(self, "instance", None) else None
         if perfil_usuario:
@@ -118,7 +125,17 @@ class AdminUserCreateForm(PerfilUsuarioFormMixin, UserCreationForm):
 class UserApprovalForm(PerfilUsuarioFormMixin, forms.ModelForm):
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "email", "phone", "access_level", "authorized_condominiums", "is_approved", "is_blocked", "is_active")
+        fields = (
+            "first_name",
+            "last_name",
+            "email",
+            "phone",
+            "access_level",
+            "authorized_condominiums",
+            "is_approved",
+            "is_blocked",
+            "is_active",
+        )
         widgets = {"authorized_condominiums": forms.CheckboxSelectMultiple}
 
     def __init__(self, *args, **kwargs):
