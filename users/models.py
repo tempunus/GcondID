@@ -30,8 +30,8 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     class AccessLevel(models.TextChoices):
         ADMIN = "admin", "Administrador"
-        FUNCIONARIO = "funcionario", "Funcionario"
-        VISITANTE = "visitante", "Visitante/Restrito"
+        ZELADORIA = "zeladoria", "zeladoria"
+        USUARIO = "usuario", "Usuario Restrito"
 
     email = models.EmailField("email", unique=True)
     phone = models.CharField("telefone/whatsapp", max_length=20, blank=True)
